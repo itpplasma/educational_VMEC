@@ -66,6 +66,12 @@ SUBROUTINE guess_axis(r1, z1, ru0, zu0)
   ! SEARCH (irgrid, izgrid) IN EACH PHI-PLANE FOR POINTS WHICH
   ! YIELD A VALUE FOR THE JACOBIAN WITH THE CORRECT SIGN (SIGNGS)
   ! CHOOSES THE AXIS POSITION SO THE MIN VALUE OF THE JACOBIAN IS MAXIMIZED
+  
+  PRINT *, "=== GUESS_AXIS DEBUG: Starting axis search ==="
+  PRINT *, "lasym = ", lasym
+  PRINT *, "Initial axis from input: R =", r1(1,1,1,0), "Z =", z1(1,1,1,0)
+  PRINT *, "signgs =", signgs
+  PRINT *, "ns =", ns, "nzeta =", nzeta, "ntheta1 =", ntheta1
 
   ns12 = (ns+1)/2
 
@@ -103,6 +109,10 @@ SUBROUTINE guess_axis(r1, z1, ru0, zu0)
            ru12(iv,iu)=-(ru0(ns,  ivminus,iu_r)   + ru0(ns12,ivminus,iu_r))*p5
            zu12(iv,iu)= (zu0(ns,  ivminus,iu_r)   + zu0(ns12,ivminus,iu_r))*p5
         END DO
+     ELSE
+        IF (iv == 1) THEN
+           PRINT *, "  ASYMMETRIC MODE: Using full theta range"
+        END IF
      END IF
 
      ! Scan over r-z grid for interior point
@@ -114,6 +124,12 @@ SUBROUTINE guess_axis(r1, z1, ru0, zu0)
      ! initial guess for new axis: center of grid
      rcom(iv) = (rmax + rmin)/2.0_dp
      zcom(iv) = (zmax + zmin)/2.0_dp
+     
+     IF (iv == 1) THEN
+        PRINT *, "  Plane ", iv, ": rmin=", rmin, "rmax=", rmax
+        PRINT *, "           zmin=", zmin, "zmax=", zmax
+        PRINT *, "           Initial guess: rcom=", rcom(iv), "zcom=", zcom(iv)
+     END IF
 
      ! Estimate jacobian based on boundary and 1/2 surface
      ds = (ns - ns12)*hs
@@ -147,6 +163,9 @@ SUBROUTINE guess_axis(r1, z1, ru0, zu0)
               mintau = mintemp
               rcom(iv) = rlim
               zcom(iv) = zlim
+              IF (iv == 1 .AND. klim <= 5 .AND. nlim <= 5) THEN
+                 PRINT *, "    New best: rlim=", rlim, "zlim=", zlim, "mintau=", mintau
+              END IF
            ELSE IF (mintemp .eq. mintau) THEN
               ! If up-down symmetric and lasym=T, need this to pick z = 0
               IF (ABS(zcom(iv)).gt.ABS(zlim)) then
@@ -168,6 +187,28 @@ SUBROUTINE guess_axis(r1, z1, ru0, zu0)
   end if ! .not. lasym
 
   ! FOURIER TRANSFORM RCOM, ZCOM
+  PRINT *, "=== Final axis positions in real space ==="
+  DO iv = 1, MIN(4, nzeta)
+     PRINT *, "  Plane ", iv, ": rcom=", rcom(iv), "zcom=", zcom(iv)
+  END DO
+  PRINT *, "  Grid search complete - final mintau for plane 1:", mintau
+  
+  ! DEBUG: Show boundary geometry arrays to compare with VMEC++
+  PRINT *, "=== EDU_VMEC BOUNDARY GEOMETRY DEBUG ==="
+  iv = 1  ! First toroidal plane
+  PRINT *, "Plane ", iv, " geometry arrays:"
+  DO iu = 1, MIN(5, ntheta1)
+     PRINT *, "  iu=", iu, ": r1b=", r1b(iv,iu), " z1b=", z1b(iv,iu)
+     PRINT *, "  iu=", iu, ": r12=", r12(iv,iu), " z12=", z12(iv,iu)  
+     PRINT *, "  iu=", iu, ": ru12=", ru12(iv,iu), " zu12=", zu12(iv,iu)
+  END DO
+  
+  ! DEBUG: Show raw Fourier coefficients before scaling
+  DO n = 0, MIN(ntor, 3)
+     PRINT *, "Raw before scaling n=", n, ": raxis_cc=", dzeta*SUM(cosnv(:,n)*rcom(:))/nscale(n), &
+              " zaxis_cc=", dzeta*SUM(cosnv(:,n)*zcom(:))/nscale(n)
+  END DO
+  
   dzeta = two/nzeta
   DO n = 0, ntor
      raxis_cc(n) = dzeta*SUM(cosnv(:,n)*rcom(:))/nscale(n)
@@ -180,6 +221,15 @@ SUBROUTINE guess_axis(r1, z1, ru0, zu0)
         zaxis_cc(n) = p5*zaxis_cc(n)
      END IF
   END DO
+  
+  PRINT *, "=== EDU_VMEC AXIS RECOVERY DEBUG ==="
+  DO n = 0, ntor
+    PRINT *, "n=", n, ": raxis_cc=", raxis_cc(n), " zaxis_cs=", zaxis_cs(n)
+    IF (lasym) THEN
+       PRINT *, "n=", n, ": raxis_cs=", raxis_cs(n), " zaxis_cc=", zaxis_cc(n)
+    END IF
+  END DO
+  PRINT *, "=== EDU_VMEC AXIS RECOVERY COMPLETE ==="
 
   ! debugging output from guess_axis
   if (open_dbg_context("guess_axis")) then
