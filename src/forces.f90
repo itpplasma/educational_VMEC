@@ -127,6 +127,16 @@ SUBROUTINE forces
 
   ! CONSTRUCT CYLINDRICAL FORCE KERNELS
   ! NOTE: presg(ns+1) == 0, AND WILL BE "FILLED IN" AT EDGE FOR FREE-BOUNDARY BY RBSQ
+  
+  ! Debug: Add debug output to compare with VMEC++ first iteration behavior
+  if (iter2 == 1) then
+    print *, "DEBUG: Educational_VMEC first iteration force construction starting"
+    print *, "  First few guu values: ", guu(1:5)
+    print *, "  First few gvv values: ", gvv(1:5)
+    print *, "  First few armn_e values: ", armn_e(1:5)
+    print *, "  First few azmn_e values: ", azmn_e(1:5)
+  end if
+  
   DO l = 1, nrzt
      guu(l) = p5*(guu(l) + guu(l+1))
      gvv(l) = p5*(gvv(l) + gvv(l+1))
