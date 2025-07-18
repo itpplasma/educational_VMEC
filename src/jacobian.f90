@@ -57,6 +57,13 @@ SUBROUTINE jacobian
                    - zu(l,modd) *r1(l,modd) - zu(l-1,modd) *r1(l-1,modd)              &
                + (   ru(l,meven)*z1(l,modd) + ru(l-1,meven)*z1(l-1,modd)              &
                    - zu(l,meven)*r1(l,modd) - zu(l-1,meven)*r1(l-1,modd) )/shalf(l) )
+    
+    ! Debug: trace negative tau values (first few radial/theta indices)
+    if (tau(l) < 0.0 .and. l <= 5*ntheta3) then
+      print *, "DEBUG: Negative tau at l=", l, " tau=", tau(l)
+      print *, "  tau_main=", ru12(l)*zs(l) - rs(l)*zu12(l)
+      print *, "  ru12=", ru12(l), " zs=", zs(l), " rs=", rs(l), " zu12=", zu12(l)
+    endif
   END DO
 
   ! extrapolate as constant to axis
@@ -66,9 +73,13 @@ SUBROUTINE jacobian
 ! TEST FOR SIGN CHANGE IN JACOBIAN
   taumax = MAXVAL(tau(2:nrzt))
   taumin = MINVAL(tau(2:nrzt))
-  IF (taumax*taumin .lt. zero) then
+  ! Debug: output jacobian status with iteration info
+  if (taumax*taumin .lt. zero) then
      ! bad jacobian !
      first = 2
+     print *, "DEBUG: Educational_VMEC BAD_JACOBIAN - taumin=", taumin, " taumax=", taumax, " iter=", iter2
+  else
+     print *, "DEBUG: Educational_VMEC GOOD_JACOBIAN - taumin=", taumin, " taumax=", taumax, " iter=", iter2
   end if
 
   ! check output from jacobian()
