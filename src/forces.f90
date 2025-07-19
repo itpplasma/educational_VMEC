@@ -135,6 +135,23 @@ SUBROUTINE forces
     print *, "  First few gvv values: ", gvv(1:5)
     print *, "  First few armn_e values: ", armn_e(1:5)
     print *, "  First few azmn_e values: ", azmn_e(1:5)
+    print *, "  First few lu_e values: ", lu_e(1:5)
+    print *, "  First few shalf values: ", shalf(1:5)
+    print *, "  First few zu12 values: ", zu12(1:5)
+    print *, "  First few ru12 values: ", ru12(1:5)
+    
+    ! Check for NaN at specific indices that are problematic in VMEC++
+    do l = 1, min(20, nrzt)
+      if (.not. (armn_e(l) == armn_e(l))) then
+        print *, "ERROR: NaN detected in armn_e at l=", l
+      endif
+      if (.not. (azmn_e(l) == azmn_e(l))) then
+        print *, "ERROR: NaN detected in azmn_e at l=", l
+      endif
+      if (.not. (lu_e(l) == lu_e(l))) then
+        print *, "ERROR: NaN detected in lu_e at l=", l, " value=", lu_e(l)
+      endif
+    end do
   end if
   
   DO l = 1, nrzt
