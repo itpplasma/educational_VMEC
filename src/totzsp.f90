@@ -301,6 +301,30 @@ SUBROUTINE totzspa(rzl_array, r11, ru1, rv1, z11, zu1, zv1, lu1, lv1, rcn1, zcn1
   lu1 = 0;  lv1 = 0
   rcn1 = 0; zcn1 = 0
 
+  ! DEBUG: Print first few input Fourier coefficients for asymmetric case
+  if (iter2 == 1) then
+    print *, "DEBUG: totzspa first iteration - asymmetric transform"
+    print *, "  ns=", ns, " ntor=", ntor, " mpol1=", mpol1
+    print *, "  nzeta=", nzeta, " ntheta3=", ntheta3
+    ! Print first few rmnsc coefficients (SIN(mu) COS(nv))
+    print *, "  First rmnsc values:"
+    do m = 0, min(2, mpol1)
+      do n = 0, min(2, ntor)
+        print *, "    m=", m, " n=", n, " rmnsc(1:3)=", rmnsc(1:min(3,ns), n+ioff, m+joff)
+      end do
+    end do
+    ! Check for NaN in input arrays
+    do j1 = 1, min(ns, 10)
+      do n = 0, ntor
+        do m = 0, mpol1
+          if (.not. (rmnsc(j1,n+ioff,m+joff) == rmnsc(j1,n+ioff,m+joff))) then
+            print *, "ERROR: NaN in rmnsc at j1=", j1, " n=", n, " m=", m
+          endif
+        end do
+      end do
+    end do
+  end if
+
   IF (jlam(m0) .gt. 1) lmncc(1,:,m0+joff) = lmncc(2,:,m0+joff)
 
   DO m = 0, mpol1
@@ -343,6 +367,17 @@ SUBROUTINE totzspa(rzl_array, r11, ru1, rv1, z11, zu1, zv1, lu1, lv1, rcn1, zcn1
         z11(:,i,mparity) = z11(:,i,mparity) + work1(:,6)*cosmu(i,m)
         zu1(:,i,mparity) = zu1(:,i,mparity) + work1(:,6)*sinmum(i,m)
         lu1(:,i,mparity) = lu1(:,i,mparity) + work1(:,10)*sinmum(i,m)
+        
+        ! DEBUG: Check intermediate values for first few points
+        if (iter2 == 1 .and. m <= 2 .and. i <= 3) then
+          print *, "  m=", m, " i=", i, " mparity=", mparity
+          print *, "    work1(1,1)=", work1(1,1), " sinmu=", sinmu(i,m)
+          print *, "    r11(1,i,mparity)=", r11(1,i,mparity)
+          ! Check for NaN
+          if (.not. (r11(1,i,mparity) == r11(1,i,mparity))) then
+            print *, "ERROR: NaN detected in r11 at i=", i, " m=", m
+          endif
+        end if
 
 ! #ifndef _HBANGLE
         rcn1(:,i,mparity) = rcn1(:,i,mparity) + work1(:,1)*sinmux
@@ -367,6 +402,28 @@ SUBROUTINE totzspa(rzl_array, r11, ru1, rv1, z11, zu1, zv1, lu1, lv1, rcn1, zcn1
         lv1(:,i,mparity) = lv1(:,i,mparity) - (work1(:,11)*sinmu(i,m)+work1(:,12)*cosmu(i,m))
      END DO
   END DO
+
+  ! DEBUG: Print first few output values
+  if (iter2 == 1) then
+    print *, "DEBUG: totzspa output - first few values:"
+    print *, "  r11(1:3,1,0)=", r11(1:3,1,0)
+    print *, "  r11(1:3,1,1)=", r11(1:3,1,1)
+    print *, "  z11(1:3,1,0)=", z11(1:3,1,0)
+    print *, "  z11(1:3,1,1)=", z11(1:3,1,1)
+    ! Check for NaN in outputs
+    do i = 1, min(10, ns*nzeta)
+      do j1 = 1, ntheta3
+        do k = 0, 1
+          if (.not. (r11(i,j1,k) == r11(i,j1,k))) then
+            print *, "ERROR: NaN in r11 output at i=", i, " j1=", j1, " k=", k
+          endif
+          if (.not. (z11(i,j1,k) == z11(i,j1,k))) then
+            print *, "ERROR: NaN in z11 output at i=", i, " j1=", j1, " k=", k
+          endif
+        end do
+      end do
+    end do
+  end if
 
   DEALLOCATE (work1)
 
