@@ -62,6 +62,9 @@ MODULE vmec_input
   REAL(rprec), DIMENSION(nigroup)   :: extcur
   LOGICAL                           :: lfreeb
   LOGICAL                           :: lasym
+  !> Write a complete three-dimensional output for the last available
+  !> iterate even when the force tolerance was not reached.
+  LOGICAL                           :: lfull3d1out
 
   !> switch between implementations of NESTOR:
   !> vac1 (magnetic scalar potential, both Stellarator and Tokamak)
@@ -214,6 +217,7 @@ MODULE vmec_input
      phiedge,       &
      lfreeb,        &
      lasym,         &
+     lfull3d1out,   &
      lbsubs,        &
      vac_1_2,       &
      iter2_to_dump             , & ! dbgout
@@ -350,6 +354,7 @@ SUBROUTINE read_indata_namelist (iunit, istat)
 
   lfreeb = .true.
   lasym = .false.
+  lfull3d1out = .false.
   lbsubs = .false.
 
   pcurr_type = 'power_series'
@@ -412,6 +417,7 @@ SUBROUTINE write_indata_namelist (iunit, istat)
   IF (ins(1) > 1) WRITE(iunit,'(a,(1p,4i14))') '  NITER_ARRAY = ',(niter_array(i), i=1,ins(1)-1)
   WRITE(iunit,'(A)') '!----- Grid Parameters -----'
   WRITE(iunit,outboo) 'LASYM',lasym
+  WRITE(iunit,outboo) 'LFULL3D1OUT',lfull3d1out
   WRITE(iunit,outint4) 'NFP',nfp
   WRITE(iunit,outint4) 'MPOL',mpol
   WRITE(iunit,outint4) 'NTOR',ntor

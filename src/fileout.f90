@@ -20,6 +20,7 @@ SUBROUTINE fileout(ier_flag)
   INTEGER :: js
   INTEGER :: first0
   LOGICAL :: lterm
+  LOGICAL :: write_full_output
 
   REAL(rprec), ALLOCATABLE :: br_out(:), bz_out(:)
 
@@ -41,13 +42,14 @@ SUBROUTINE fileout(ier_flag)
   ! AVERAGE EQUILIBRIUM PROPERTIES AT END OF RUN
   iequi = 1
   lterm = (ier_flag.eq.norm_term_flag  .or. ier_flag.eq.successful_term_flag)
+  write_full_output = lterm .or. lfull3d1out
 
   loc_ier_flag = ier_flag
   if (ier_flag .eq. successful_term_flag) then
      loc_ier_flag = norm_term_flag
   end if
 
-  IF (lterm) THEN
+  IF (write_full_output) THEN
      ! Must save first value if in "restart" mode
      first0 = first
      CALL funct3d (istat)
@@ -67,6 +69,10 @@ SUBROUTINE fileout(ier_flag)
      gc = xc
      !          br,     bz,     bsubu, bsubv, tau,       rzl_array, ier_flag
      CALL eqfor(br_out, bz_out, clmn,  blmn,  rcon(1,1), gc,        ier_flag)
+
+     IF (.NOT. lterm .AND. lfull3d1out .AND. nthreed .gt. 0) THEN
+        WRITE (nthreed, '(1x,a)') 'LFULL3D1OUT: writing the last available 3-D iterate'
+     END IF
 
   END IF
 
