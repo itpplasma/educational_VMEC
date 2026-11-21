@@ -1,5 +1,5 @@
 <map id="becoil" name="becoil">
-<area shape="rect" id="Node000001" title="Compute the cylindrical components of the magnetic field due to external coils. by bi&#45;linear interpol..." alt="" coords="775,56,830,82"/>
+<area shape="rect" id="Node000001" title="Compute the cylindrical components of the magnetic field due to external coils. by bi&#45;cubic Lagrange ..." alt="" coords="775,56,830,82"/>
 <area shape="rect" id="Node000002" href="$db/d3d/bextern_8f90.html#a90228cc5f358147ae7f59953d6f9cced" title="Compute the total magnetic field due to external coils and the net toroidal plasma current." alt="" coords="663,56,727,82"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="759,72,727,72,727,66,759,66"/>
 <area shape="rect" id="Node000003" href="$dd/d6d/vacuum_8f90.html#a0acbc18d2ab7664835d797b42ce49a35" title="Compute the vacuum contribution to the free&#45;boundary energy functional." alt="" coords="548,56,615,82"/>

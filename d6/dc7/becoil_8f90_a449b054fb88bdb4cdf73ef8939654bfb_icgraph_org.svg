@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="Node000001" class="node">
 <title>Node1</title>
-<g id="a_Node000001"><a xlink:title="Compute the cylindrical components of the magnetic field due to external coils. by bi&#45;linear interpol...">
+<g id="a_Node000001"><a xlink:title="Compute the cylindrical components of the magnetic field due to external coils. by bi&#45;cubic Lagrange ...">
 <polygon fill="#999999" stroke="#666666" points="618.5,-37.25 577,-37.25 577,-18 618.5,-18 618.5,-37.25"/>
 <text text-anchor="middle" x="597.75" y="-23.75" font-family="Helvetica,sans-Serif" font-size="10.00">becoil</text>
 </a>

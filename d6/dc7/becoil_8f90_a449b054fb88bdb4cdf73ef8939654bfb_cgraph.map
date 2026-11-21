@@ -1,0 +1,5 @@
+<map id="becoil" name="becoil">
+<area shape="rect" id="Node000001" title="Compute the cylindrical components of the magnetic field due to external coils. by bi&#45;cubic Lagrange ..." alt="" coords="5,5,61,31"/>
+<area shape="rect" id="Node000002" href="$d6/dc7/becoil_8f90.html#a094fcb7ea985872eaabd8d6bde4d286e" title="Weights of the n&#45;node Lagrange polynomial on the nodes 0, ..., n&#45;1 at u." alt="" coords="109,5,231,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,16,93,16,93,21,61,21"/>
+</map>
